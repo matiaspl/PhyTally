@@ -159,6 +159,28 @@ cp phytally-hub.example.json phytally-hub.json
 sudo ./phytally-hub-linux-arm64 -config ./phytally-hub.json
 ```
 
+Suggested Wi-Fi hardware for the Linux / VM hub:
+
+- Prefer **Atheros ath9k / ath9k_htc** devices when you want both monitor-mode TX
+  (`rawinject`) and ath9k spectral support. The Linux hub looks for ath9k and
+  ath9k_htc debugfs nodes when building `/api/v1/wifi/survey`.
+- For the **best spectral scan support**, use a native or PCIe-passthrough
+  ath9k card from the **AR92xx / AR93xx** families. Those chipsets expose the
+  spectral scan feature documented by Linux Wireless, and they are the safest
+  choice if spectrum data matters as much as tally airtime.
+- For a **USB adapter passed through to a VM**, look for **AR9271**
+  (`ath9k_htc`) hardware. Safe examples from the upstream ath9k_htc supported
+  device list include:
+  - **TP-Link TL-WN722N V1.x only**
+  - **TP-Link TL-WN721N**
+  - **Netgear WNA1100**
+- Buy by **chipset / USB ID**, not by retail name alone. Several product lines
+  changed chipsets across later revisions, so a used adapter that says
+  `AR9271` / `0cf3:9271` is a better fit than a matching box label.
+- Avoid vendor-driver Realtek adapters for the dedicated PhyTally radio. They
+  are common, but they are a poor fit when you need reliable monitor mode,
+  monitor-mode TX, and optional spectral survey data on Linux.
+
 Switcher-related config fields:
 
 ```json

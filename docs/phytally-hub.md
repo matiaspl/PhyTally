@@ -65,6 +65,26 @@ The Go service in `phytally-hub/` is split into five layers:
 - Dashboard and API served by the Linux process (default listen per config)
 - Receivers unchanged: promiscuous decode of beacons/probe responses with OUI `11:22:33`; probe telemetry with OUI `11:22:44`
 
+## Suggested Wi-Fi hardware
+
+- Prefer **Atheros ath9k / ath9k_htc** devices for the dedicated PhyTally NIC.
+  The `rawinject` backend depends on monitor mode plus monitor-mode TX, and the
+  survey path checks for ath9k / ath9k_htc spectral debugfs support.
+- If **spectral scan** is important, the best fit is a native Linux card or VM
+  PCIe passthrough using an **ath9k** chipset from the **AR92xx / AR93xx**
+  families. That is the cleanest path to the upstream ath9k spectral feature.
+- If the hub runs inside a **VM with USB passthrough**, prefer an **AR9271**
+  adapter using **ath9k_htc**. Known-good examples from the upstream supported
+  device list include **TP-Link TL-WN722N V1.x**, **TP-Link TL-WN721N**, and
+  **Netgear WNA1100**.
+- Buy by **actual chipset**, not just by product name. Later hardware revisions
+  often swapped chipsets, so confirm the adapter really enumerates as an
+  Atheros ath9k / ath9k_htc device before relying on it for field deployment.
+- Practical rule: if you want the least risk for `rawinject`, use an Atheros
+  adapter with a mainline Linux driver and verify monitor mode early during
+  bring-up. If you also need spectral data, favor ath9k PCIe over random USB
+  dongles.
+
 ## Current limits
 
 - Spectral data feeds **survey** only

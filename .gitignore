@@ -1,0 +1,7 @@
+.DS_Store
+.pio/
+.pio-core/
+*.log
+__pycache__/
+*.pyc
+phytally-hub/phytally-hub-linux-arm64

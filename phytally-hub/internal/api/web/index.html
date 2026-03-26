@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PhyTally Hub</title>
+  <link rel="stylesheet" href="/dashboard.css">
+</head>
+<body>
+  <main>
+    <header class="hero panel">
+      <div class="hero-top">
+        <div class="brand">
+          <div class="logo-mark" aria-hidden="true">PT</div>
+          <div>
+            <p class="eyebrow">PhyTally</p>
+            <h1>Hub Control Surface</h1>
+            <p class="subhead">Live state, receiver assignment, radio survey, and switcher configuration in one place.</p>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <button id="simulationButton" class="secondary" type="button">Toggle Simulation</button>
+          <button id="refreshButton" class="ghost" type="button">Refresh</button>
+        </div>
+      </div>
+
+      <div class="hero-metrics">
+        <div class="metric-card">
+          <span class="metric-label">Mode</span>
+          <strong id="modeBadge" class="metric-value">Loading...</strong>
+          <div id="modeMeta" class="metric-meta">Waiting for hub state...</div>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Radio</span>
+          <strong id="channelValue" class="metric-value">CH -</strong>
+          <div id="radioLine" class="metric-meta">Waiting for radio data...</div>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Receivers</span>
+          <strong id="receiverValue" class="metric-value">0 / 0</strong>
+          <div id="receiverSummary" class="metric-meta">Waiting for receivers...</div>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Telemetry</span>
+          <strong id="telemetryValue" class="metric-value">0</strong>
+          <div id="telemetryMeta" class="metric-meta">Waiting for telemetry...</div>
+        </div>
+      </div>
+
+      <div id="commandLine" class="command-banner">No command queued.</div>
+    </header>
+
+    <section class="workspace-grid top-workspace-grid">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Live State</p>
+            <h2>Tally Map</h2>
+          </div>
+          <div id="telemetryLine" class="section-meta">Waiting for telemetry...</div>
+        </div>
+        <div id="tallyGrid" class="tally-grid">
+          <div class="survey-empty">Waiting for tally state...</div>
+        </div>
+      </section>
+
+      <article class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Configuration</p>
+            <h2>Radio And Switchers</h2>
+          </div>
+          <div class="section-meta">Changes apply immediately.</div>
+        </div>
+        <div class="panel-content">
+          <form id="configForm">
+            <div class="row">
+              <label>Wireless Transport
+                <select id="wirelessTransport" name="wirelessTransport"></select>
+              </label>
+              <label id="espnowPhyModeField">ESP-NOW PHY Mode
+                <select id="espnowPhyMode" name="espnowPhyMode"></select>
+              </label>
+            </div>
+            <div class="row">
+              <label>Radio Channel
+                <input id="radioChannel" name="radioChannel" type="number" min="1" max="13" inputmode="numeric">
+              </label>
+            </div>
+            <fieldset class="switcher-source-group">
+              <legend>Switcher Source</legend>
+              <div class="switcher-source-grid">
+                <label class="switcher-choice">
+                  <input type="radio" name="switcherSource" value="none" checked>
+                  <span>None</span>
+                </label>
+                <label class="switcher-choice">
+                  <input type="radio" name="switcherSource" value="atem">
+                  <span>ATEM</span>
+                </label>
+                <label class="switcher-choice">
+                  <input type="radio" name="switcherSource" value="vmix">
+                  <span>vMix</span>
+                </label>
+                <label class="switcher-choice">
+                  <input type="radio" name="switcherSource" value="obs">
+                  <span>OBS</span>
+                </label>
+                <label class="switcher-choice">
+                  <input type="radio" name="switcherSource" value="tsl">
+                  <span>TSL 3.1</span>
+                </label>
+              </div>
+            </fieldset>
+            <div class="row">
+              <label id="atemField" class="switcher-field">ATEM IP
+                <input id="atemIp" name="atemIp" autocomplete="off">
+              </label>
+              <label id="vmixField" class="switcher-field">vMix IP
+                <input id="vmixIp" name="vmixIp" autocomplete="off">
+              </label>
+            </div>
+            <div class="row">
+              <label id="obsUrlField" class="switcher-field">OBS WebSocket URL
+                <input id="obsUrl" name="obsUrl" autocomplete="off" placeholder="ws://127.0.0.1:4455">
+              </label>
+              <label id="obsPasswordField" class="switcher-field">OBS Password
+                <input id="obsPassword" name="obsPassword" type="password" autocomplete="new-password" placeholder="Leave blank to keep current">
+              </label>
+            </div>
+            <label id="tslField" class="switcher-field">TSL Listen Address
+              <input id="tslListenAddr" name="tslListenAddr" autocomplete="off" placeholder=":9800">
+            </label>
+            <button type="submit">Save Configuration</button>
+          </form>
+          <div class="note">REST API: <code>/api/v1</code>.</div>
+        </div>
+      </article>
+    </section>
+
+    <section class="stack">
+      <section class="panel receivers-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Receivers</p>
+            <h2>Assignments And Health</h2>
+          </div>
+          <div class="section-meta">Sorted by tally ID, then MAC.</div>
+        </div>
+        <div id="receiversBody" class="receiver-grid">
+          <div class="survey-empty">Waiting for receivers...</div>
+        </div>
+      </section>
+      <article class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Spectrum</p>
+            <h2>Wi-Fi Survey</h2>
+          </div>
+          <div class="toolbar">
+            <button id="wifiSurveyButton" class="ghost" type="button">Run Survey</button>
+          </div>
+        </div>
+        <div class="panel-content">
+          <div id="wifiSurveyMeta" class="muted-box">Available on the Linux hub. The dedicated radio may briefly pause tally traffic during a scan.</div>
+          <div id="wifiSurveyProgress" class="survey-progress" hidden>
+            <div class="survey-progress-bar">
+              <span id="wifiSurveyProgressFill" class="survey-progress-fill"></span>
+            </div>
+            <div id="wifiSurveyProgressLabel" class="survey-progress-label">Preparing scan...</div>
+          </div>
+          <div id="wifiSurveyList" class="survey-list">
+            <div class="survey-empty">No survey results yet.</div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <details class="panel details-panel">
+      <summary>Diagnostics</summary>
+      <div class="details-body">
+        <div class="note">Raw API snapshot.</div>
+        <pre id="statusJson">Loading...</pre>
+      </div>
+    </details>
+  </main>
+  <script src="/dashboard.js"></script>
+</body>
+</html>

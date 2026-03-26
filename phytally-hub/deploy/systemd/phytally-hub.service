@@ -1,0 +1,19 @@
+[Unit]
+Description=PhyTally Linux Hub
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/phytally
+ExecStartPre=/usr/bin/bash -lc 'for i in $(seq 1 60); do /usr/sbin/ip link show phytally0 >/dev/null 2>&1 && exit 0; sleep 1; done; exit 1'
+ExecStartPre=/usr/bin/bash -lc '/usr/bin/nmcli device set phytally0 managed no || true'
+ExecStartPre=/usr/bin/bash -lc '/usr/sbin/ip link set phytally0 up || true'
+ExecStart=/usr/local/bin/phytally-hub -config /etc/phytally/phytally-hub.json
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
